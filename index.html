@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Memory Game</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h3>Memory Game(simple version)</h3>
+    <h6>Rules:if 2 cards matched,they remain face-up.If not, they flip back down after 1s.Game over when all cards are face-up</h6>
+    <div id="idGame"></div>
+    <script>
+const gameContainer = document.getElementById("idGame")
+const A=["red","blue","green","orange","purple","red","blue","green","orange","purple"]//10
+
+function shuffle(A){//returns same array with values shuffled(Fisher Yates algo)
+  let n = A.length
+  while (n){//While there are elements in array
+    let i = Math.floor(Math.random() * n)//Pick a random index
+    n--
+    let temp = A[n]//swap last element with it
+    A[n] = A[i]
+    A[i] = temp
+  }
+  return A
+}
+function createDivsForColors(A){//go through A,creates div with class with value of color.Also adds event listener for a click for each card
+  for (let a of A) {
+    const newDiv = document.createElement("div")
+    newDiv.classList.add(a)//give it class attribute of a
+    newDiv.addEventListener("click",F)//call F() when div is clicked
+    gameContainer.append(newDiv)//append newDiv to idGame element
+  }
+}
+let card1 = null,card2 = null,
+    cardsFlipped = 0,noClicking = false
+function F(evt){//fn to handle card click
+  if (noClicking) return
+  if (evt.target.classList.contains("flipped")) return
+
+  evt.target.style.backgroundColor = evt.target.classList[0]
+
+  if (!card1 || !card2) {
+    evt.target.classList.add("flipped")
+    card1 = card1 || evt.target
+    card2 = evt.target === card1 ? null : evt.target
+  }
+  if (card1 && card2) {
+    noClicking = true
+    // debugger
+    let gif1 = card1.className
+    let gif2 = card2.className
+
+    if (gif1 === gif2) {
+      cardsFlipped += 2
+      card1.removeEventListener("click", F)
+      card2.removeEventListener("click", F)
+      card1 = null
+      card2 = null
+      noClicking = false
+    } 
+    else {
+      setTimeout(()=>{
+        card1.style.backgroundColor = ""
+        card2.style.backgroundColor = ""
+        card1.classList.remove("flipped")
+        card2.classList.remove("flipped")
+        card1 = null
+        card2 = null
+        noClicking = false
+      }, 1000)
+    }
+  }
+  if (cardsFlipped === A.length) alert("Game over")
+}
+createDivsForColors(shuffle(A))//when DOM loads
+    </script>
+  </body>
+</html>
